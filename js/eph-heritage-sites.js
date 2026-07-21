@@ -997,9 +997,6 @@ function applyIntersectionFilter(preventZoom = false) {
   Cluster.clearLayers();
   let ol = document.getElementById('index-list');
   ol.innerHTML = '';
-
-  let validMarkers = [];
-  
   let btnAll = document.getElementById('btn-all');
   if (btnAll) {
     if (currentSearchQuery.trim() === '' && 
