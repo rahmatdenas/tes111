@@ -1094,25 +1094,23 @@ if (currentUsiaFilter !== 'all') {                 // ganti dari .startsWith('us
   renderNextChunk();
   updateFeatureCounts(validRecords.length);
 
-  // +++ KUNCI PENGAMAN (Debounce) +++
-  if (renderTimeoutToken) {
-    clearTimeout(renderTimeoutToken);
-  }
+  // ============================================================
+  // GANTI: dulu setTimeout(150) — sumber race condition. Sekarang
+  // langsung sinkron. Cluster.addLayers() memang didesain untuk
+  // menangani ribuan marker sekaligus secara efisien, jadi tidak
+  // perlu ditunda.
+  // ============================================================
+  let validMarkers = [];
+  validRecords.forEach(record => {
+    if (record.mapMarker) validMarkers.push(record.mapMarker);
+  });
 
-  renderTimeoutToken = setTimeout(() => {
-    validRecords.forEach(record => {
-      if (record.mapMarker) validMarkers.push(record.mapMarker);
-    });
-
-    if (validMarkers.length > 0) {
-      Cluster.addLayers(validMarkers);
-      if (!preventZoom) {
-        Map.flyToBounds(Cluster.getBounds(), { duration: 0.5 });
-      }
+  if (validMarkers.length > 0) {
+    Cluster.addLayers(validMarkers);
+    if (!preventZoom) {
+      Map.flyToBounds(Cluster.getBounds(), { duration: 0.5 });
     }
-    
-    renderTimeoutToken = null; 
-  }, 150); 
+  }
 }
 
 function generateRecordDetails(qid) {
