@@ -803,28 +803,22 @@ if (logoBranding) {
 function activateMapMarker(qid) {
   let record = Records[qid];
   if (!record.mapMarker) return; 
-
   if (record.popup && record.popup.isOpen()) {
     return;
   }
-
   try {
     Map.closePopup();
-
-    // +++ PATCH: paksa marker masuk cluster kalau belum sempat ditambahkan +++
-    // (mengatasi race condition dengan debounce 150ms di applyIntersectionFilter)
     if (!Cluster.hasLayer(record.mapMarker)) {
       Cluster.addLayer(record.mapMarker);
     }
-    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     let countSameLocation = 0;
-    currentFilteredRecords.forEach(r => {
-      if (r.lat === record.lat && r.lon === record.lon) {
-        countSameLocation++;
-      }
-    });
-
+    if (typeof currentFilteredRecords !== 'undefined') {
+      currentFilteredRecords.forEach(r => {
+        if (r.lat === record.lat && r.lon === record.lon) {
+          countSameLocation++;
+        }
+      });
+    }
     if (countSameLocation > 60) {
       Map.setView([record.lat, record.lon], TILE_LAYER_MAX_ZOOM);
       setTimeout(() => {
@@ -838,8 +832,6 @@ function activateMapMarker(qid) {
         }
       }, 350);
     } else {
-      // Sekarang cabang else "marker belum di cluster" tidak diperlukan lagi,
-      // karena sudah dijamin ada lewat guard di atas.
       Cluster.zoomToShowLayer(
         record.mapMarker,
         function() {
