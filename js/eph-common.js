@@ -812,13 +812,11 @@ function activateMapMarker(qid) {
       Cluster.addLayer(record.mapMarker);
     }
     let countSameLocation = 0;
-    if (typeof currentFilteredRecords !== 'undefined') {
-      currentFilteredRecords.forEach(r => {
-        if (r.lat === record.lat && r.lon === record.lon) {
-          countSameLocation++;
-        }
-      });
-    }
+   currentFilteredRecords.forEach(r => {
+      if (r.lat === record.lat && r.lon === record.lon) {
+        countSameLocation++;
+      }
+    });
     if (countSameLocation > 60) {
       Map.setView([record.lat, record.lon], TILE_LAYER_MAX_ZOOM);
       setTimeout(() => {
